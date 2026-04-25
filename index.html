@@ -3,126 +3,136 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arroz de Leche Marle - Gestión</title>
+    <title>Arroz de Leche Marle - Gestión HM</title>
     <style>
         :root {
             --primary: #f8bbd0;
             --dark: #ad1457;
             --success: #25D366;
-            --danger: #e91e63;
+            --info: #2196F3;
         }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff5f8; color: #333; margin: 0; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #fff5f8; color: #333; margin: 0; padding: 10px; }
         .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         
-        /* Encabezado con imagen */
-        .header-img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }
-        h1 { text-align: center; color: var(--dark); margin-top: 0; }
+        /* Imagen de cabecera */
+        .header-img { width: 100%; max-height: 250px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; display: block; }
+        h1 { text-align: center; color: var(--dark); margin: 10px 0; }
         
-        /* Formulario mejorado */
-        .form-group { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 10px; margin-bottom: 20px; }
-        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
+        /* Formulario */
+        .form-group { display: grid; grid-template-columns: 2fr 1.5fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 20px; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 5px; width: 100%; box-sizing: border-box; }
         
-        /* Botones */
-        button { cursor: pointer; border: none; border-radius: 5px; padding: 10px 15px; font-weight: bold; transition: 0.3s; }
-        .btn-add { background-color: var(--dark); color: white; }
-        .btn-whatsapp { background-color: var(--success); color: white; }
-        .btn-print { background-color: #2196F3; color: white; }
-        .btn-excel { background-color: #1D6F42; color: white; }
-        .btn-backup { background-color: #607D8B; color: white; }
+        /* Botones Principales */
+        button { cursor: pointer; border: none; border-radius: 5px; padding: 10px; font-weight: bold; transition: 0.3s; }
+        .btn-add { background-color: var(--dark); color: white; grid-column: span 5; font-size: 1.1em; }
+        .btn-add:hover { background-color: #880e4f; }
         
+        /* Barra de Herramientas */
+        .toolbar { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+        .btn-tool { color: white; font-size: 0.9em; display: flex; align-items: center; gap: 5px; }
+        .bg-print { background: var(--info); }
+        .bg-excel { background: #1D6F42; }
+        .bg-backup { background: #607D8B; }
+        .bg-me { background: var(--success); }
+
         /* Tabla */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
         th { background-color: var(--primary); color: var(--dark); }
-        .status-pago { color: #2e7d32; font-weight: bold; background: #e8f5e9; padding: 4px 8px; border-radius: 4px; }
-        .status-debe { color: #c62828; font-weight: bold; background: #ffebee; padding: 4px 8px; border-radius: 4px; }
+        .status-pago { color: #2e7d32; font-weight: bold; background: #e8f5e9; padding: 5px; border-radius: 4px; cursor: pointer; }
+        .status-debe { color: #c62828; font-weight: bold; background: #ffebee; padding: 5px; border-radius: 4px; cursor: pointer; }
 
-        /* Footer */
-        .credits { margin-top: 30px; text-align: center; font-size: 0.8em; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
+        .credits { margin-top: 30px; text-align: center; font-size: 0.85em; color: #777; border-top: 1px solid #eee; padding-top: 15px; }
         
-        @media print { .no-print { display: none; } .container { box-shadow: none; border: none; } }
-        @media (max-width: 600px) { .form-group { grid-template-columns: 1fr; } }
+        @media print { .no-print { display: none; } }
+        @media (max-width: 700px) { .form-group { grid-template-columns: 1fr 1fr; } .btn-add { grid-column: span 2; } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <img src="https://haroldco45.github.io/arrozdelechemarle/arrozdelechemarle.jpg" alt="Arroz de Leche Marle" class="header-img">
+    <img src="arrozdelechemarle.jpg" alt="Arroz de Leche Marle" class="header-img" onerror="this.src='https://haroldco45.github.io/arrozdelechemarle/arrozdelechemarle.jpg'">
     
     <h1>🍚 Arroz de Leche Marle</h1>
-    <p style="text-align: center; font-weight: bold;">Control de Pedidos y Cobranza</p>
+    <p style="text-align: center; margin-bottom: 20px;">Control de Ventas y Cobranza - <b>Vibras Positivas HM</b></p>
 
     <div class="no-print">
         <div class="form-group">
             <input type="text" id="cliente" placeholder="Nombre del Cliente">
+            <input type="number" id="telefono" placeholder="WhatsApp (Ej: 311...)">
             <select id="producto">
                 <option value="Arroz de Leche Tradicional">Tradicional</option>
                 <option value="Arroz de Leche con Queso">Con Queso</option>
                 <option value="Arroz de Leche Especial">Especial</option>
             </select>
             <input type="number" id="cantidad" placeholder="Cant." min="1" value="1">
-            <input type="number" id="precio_unitario" placeholder="Precio Unid. $">
-            <button class="btn-add" onclick="agregarRegistro()" style="grid-column: span 4;">Registrar Pedido</button>
+            <input type="number" id="precio" placeholder="Precio $">
+            <button class="btn-add" onclick="agregarRegistro()">🚀 Registrar Pedido</button>
         </div>
 
-        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-            <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
-            <button class="btn-excel" onclick="exportarExcel()">📊 Excel</button>
-            <button class="btn-backup" onclick="backup()">💾 Copiar Backup</button>
-            <button class="btn-backup" onclick="restaurar()">🔄 Restaurar</button>
-            <button class="btn-whatsapp" onclick="enviarAMi()">📲 Reporte a Mi (WhatsApp)</button>
+        <div class="toolbar">
+            <button class="btn-tool bg-print" onclick="window.print()">🖨️ Imprimir</button>
+            <button class="btn-tool bg-excel" onclick="exportarExcel()">📊 Excel</button>
+            <button class="btn-tool bg-backup" onclick="backup()">💾 Backup</button>
+            <button class="btn-tool bg-backup" onclick="restaurar()">🔄 Restaurar</button>
+            <button class="btn-tool bg-me" onclick="enviarAMi()">📲 Resumen a Mi</button>
         </div>
     </div>
 
-    <table id="tablaVentas">
-        <thead>
-            <tr>
-                <th>Cliente</th>
-                <th>Producto / Cant</th>
-                <th>Total $</th>
-                <th>Estado</th>
-                <th class="no-print">Acciones</th>
-            </tr>
-        </thead>
-        <tbody id="listaVentas"></tbody>
-    </table>
+    <div class="table-container">
+        <table id="tablaVentas">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>WhatsApp</th>
+                    <th>Pedido</th>
+                    <th>Total $</th>
+                    <th>Estado</th>
+                    <th class="no-print">Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="listaVentas"></tbody>
+        </table>
+    </div>
 
     <div class="credits">
-        <p>&copy; 2026 Desarrollado por <strong>Vibras Positivas HM</strong></p>
+        <p>&copy; 2026 Todos los derechos reservados a <strong>Vibras Positivas HM</strong></p>
     </div>
 </div>
 
 <script>
-    let ventas = JSON.parse(localStorage.getItem('ventas_marle_v2')) || [];
+    let ventas = JSON.parse(localStorage.getItem('ventas_marle_v3')) || [];
     const MI_CEL = "573117700431";
 
     function guardar() {
-        localStorage.setItem('ventas_marle_v2', JSON.stringify(ventas));
+        localStorage.setItem('ventas_marle_v3', JSON.stringify(ventas));
         renderizar();
     }
 
     function agregarRegistro() {
         const cliente = document.getElementById('cliente').value;
+        const tel = document.getElementById('telefono').value;
         const producto = document.getElementById('producto').value;
-        const cantidad = document.getElementById('cantidad').value;
-        const precio = document.getElementById('precio_unitario').value;
+        const cant = document.getElementById('cantidad').value;
+        const precio = document.getElementById('precio').value;
 
-        if(!cliente || !precio || cantidad < 1) return alert("Por favor complete los datos del pedido.");
-
-        const total = parseFloat(cantidad) * parseFloat(precio);
+        if(!cliente || !precio || !tel) return alert("Por favor llena Nombre, Teléfono y Precio");
 
         ventas.push({
             id: Date.now(),
             nombre: cliente,
+            tel: tel.startsWith('57') ? tel : '57' + tel,
             producto: producto,
-            cantidad: cantidad,
-            total: total,
+            cant: cant,
+            total: parseFloat(cant) * parseFloat(precio),
             estado: 'debe'
         });
         
+        // Limpiar campos
         document.getElementById('cliente').value = '';
-        document.getElementById('cantidad').value = '1';
-        document.getElementById('precio_unitario').value = '';
+        document.getElementById('telefono').value = '';
+        document.getElementById('precio').value = '';
         guardar();
     }
 
@@ -135,38 +145,37 @@
     }
 
     function eliminar(id) {
-        if(confirm("¿Eliminar este registro?")) {
+        if(confirm("¿Eliminar registro?")) {
             ventas = ventas.filter(v => v.id !== id);
             guardar();
         }
     }
 
-    function enviarWhatsApp(v) {
-        const msg = `Hola ${v.nombre}, te saludamos de Arroz de Leche Marle. Tu pedido de ${v.cantidad} ${v.producto} por valor de $${v.total} está pendiente de pago. ¡Gracias!`;
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    function cobrarCliente(v) {
+        const msg = `Hola ${v.nombre}, te saludamos de Arroz de Leche Marle 🍚. Te recordamos tu pedido de ${v.cant} ${v.producto} por un total de $${v.total}. ¿Deseas pagarlo ahora? ¡Gracias!`;
+        window.open(`https://api.whatsapp.com/send?phone=${v.tel}&text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     function enviarAMi() {
         let deudores = ventas.filter(v => v.estado === 'debe');
-        let totalDeuda = deudores.reduce((acc, v) => acc + v.total, 0);
-        const msg = `Resumen de Ventas - Vibras Positivas HM\n------------------\nTotal pendiente: $${totalDeuda}\nPedidos por cobrar: ${deudores.length}`;
+        let total = deudores.reduce((acc, v) => acc + v.total, 0);
+        const msg = `Vibras Positivas HM - Reporte:\nTienes ${deudores.length} deudores.\nTotal por cobrar: $${total}`;
         window.open(`https://api.whatsapp.com/send?phone=${MI_CEL}&text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     function exportarExcel() {
-        let tabla = document.getElementById("tablaVentas");
-        let excelURL = 'data:application/vnd.ms-excel,' + encodeURIComponent(tabla.outerHTML);
-        window.open(excelURL);
+        let table = document.getElementById("tablaVentas");
+        window.open('data:application/vnd.ms-excel,' + encodeURIComponent(table.outerHTML));
     }
 
     function backup() {
         navigator.clipboard.writeText(JSON.stringify(ventas));
-        alert("Backup copiado al portapapeles.");
+        alert("Copia de seguridad copiada. Guárdala en un mensaje o nota.");
     }
 
     function restaurar() {
-        const data = prompt("Pega el código de backup:");
-        if(data) { try { ventas = JSON.parse(data); guardar(); } catch(e) { alert("Error"); } }
+        const data = prompt("Pega el código de respaldo aquí:");
+        if(data) { try { ventas = JSON.parse(data); guardar(); } catch(e) { alert("Datos no válidos"); } }
     }
 
     function renderizar() {
@@ -176,16 +185,17 @@
             lista.innerHTML += `
                 <tr>
                     <td>${v.nombre}</td>
-                    <td>${v.producto} (x${v.cantidad})</td>
-                    <td><strong>$${v.total.toLocaleString()}</strong></td>
+                    <td>${v.tel}</td>
+                    <td>${v.producto} (x${v.cant})</td>
+                    <td><b>$${v.total.toLocaleString()}</b></td>
                     <td>
-                        <span class="${v.estado === 'pagado' ? 'status-pago' : 'status-debe'}" onclick="cambiarEstado(${v.id})" style="cursor:pointer">
+                        <span class="${v.estado === 'pagado' ? 'status-pago' : 'status-debe'}" onclick="cambiarEstado(${v.id})">
                             ${v.estado.toUpperCase()}
                         </span>
                     </td>
                     <td class="no-print">
-                        <button class="btn-whatsapp" onclick='enviarWhatsApp(${JSON.stringify(v)})'>💬</button>
-                        <button onclick="eliminar(${v.id})">🗑️</button>
+                        <button style="background:#25D366; color:white;" onclick='cobrarCliente(${JSON.stringify(v)})'>💬 Cobrar</button>
+                        <button style="background:#ff5252; color:white;" onclick="eliminar(${v.id})">🗑️</button>
                     </td>
                 </tr>
             `;
