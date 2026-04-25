@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arroz de Leche Marle - Gestión</title>
+    <style>
+        :root {
+            --primary: #f8bbd0;
+            --dark: #ad1457;
+            --success: #25D366;
+            --danger: #e91e63;
+        }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff5f8; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h1, h2 { text-align: center; color: var(--dark); }
+        
+        /* Formulario */
+        .form-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        
+        /* Botones */
+        button { cursor: pointer; border: none; border-radius: 5px; padding: 10px 15px; font-weight: bold; transition: 0.3s; }
+        .btn-add { background-color: var(--dark); color: white; }
+        .btn-whatsapp { background-color: var(--success); color: white; }
+        .btn-print { background-color: #2196F3; color: white; }
+        .btn-excel { background-color: #1D6F42; color: white; }
+        .btn-backup { background-color: #607D8B; color: white; }
+        
+        /* Tabla */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
+        th { background-color: var(--primary); color: var(--dark); }
+        .status-pago { color: #2e7d32; font-weight: bold; }
+        .status-debe { color: #c62828; font-weight: bold; }
+
+        /* Footer Créditos */
+        .credits { margin-top: 30px; text-align: center; font-size: 0.8em; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
+        
+        @media print {
+            .no-print { display: none; }
+            body { background: white; }
+            .container { box-shadow: none; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🍚 Arroz de Leche Marle</h1>
+    <p style="text-align: center;">Gestión de Ventas y Cobros</p>
+
+    <div class="no-print">
+        <div class="form-group">
+            <input type="text" id="cliente" placeholder="Nombre del Cliente">
+            <input type="number" id="valor" placeholder="Valor $">
+            <button class="btn-add" onclick="agregarRegistro()">Añadir Registro</button>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+            <button class="btn-print" onclick="window.print()">🖨️ Imprimir</button>
+            <button class="btn-excel" onclick="exportarExcel()">📊 Excel</button>
+            <button class="btn-backup" onclick="backup()">💾 Copiar Backup</button>
+            <button class="btn-backup" onclick="restaurar()">🔄 Restaurar</button>
+            <button class="btn-whatsapp" onclick="enviarAMi()">📲 Enviar Reporte a Mi</button>
+        </div>
+    </div>
+
+    <table id="tablaVentas">
+        <thead>
+            <tr>
+                <th>Cliente</th>
+                <th>Valor</th>
+                <th>Estado</th>
+                <th class="no-print">Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="listaVentas">
+            </tbody>
+    </table>
+
+    <div class="credits">
+        <p>&copy; 2026 Desarrollado por <strong>Vibras Positivas HM</strong></p>
+    </div>
+</div>
+
+<script>
+    let ventas = JSON.parse(localStorage.getItem('ventas_marle')) || [];
+    const MI_CEL = "573117700431";
+
+    function guardar() {
+        localStorage.setItem('ventas_marle', JSON.stringify(ventas));
+        renderizar();
+    }
+
+    function agregarRegistro() {
+        const cliente = document.getElementById('cliente').value;
+        const valor = document.getElementById('valor').value;
+        if(!cliente || !valor) return alert("Llena todos los campos");
+
+        ventas.push({
+            id: Date.now(),
+            nombre: cliente,
+            monto: valor,
+            estado: 'debe'
+        });
+        
+        document.getElementById('cliente').value = '';
+        document.getElementById('valor').value = '';
+        guardar();
+    }
+
+    function cambiarEstado(id) {
+        ventas = ventas.map(v => {
+            if(v.id === id) v.estado = v.estado === 'debe' ? 'pagado' : 'debe';
+            return v;
+        });
+        guardar();
+    }
+
+    function eliminar(id) {
+        if(confirm("¿Eliminar este registro?")) {
+            ventas = ventas.filter(v => v.id !== id);
+            guardar();
+        }
+    }
+
+    function enviarWhatsApp(nombre, monto) {
+        const msg = `Hola ${nombre}, te recordamos tu saldo de $${monto} en Arroz de Leche Marle. ¡Gracias!`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function enviarAMi() {
+        let total = ventas.reduce((acc, v) => acc + parseFloat(v.monto), 0);
+        let deudas = ventas.filter(v => v.estado === 'debe').length;
+        const msg = `Resumen Vibras Positivas HM:\nTotal: $${total}\nClientes pendientes: ${deudas}`;
+        window.open(`https://api.whatsapp.com/send?phone=${MI_CEL}&text=${encodeURIComponent(msg)}`, '_blank');
+    }
+
+    function exportarExcel() {
+        let tabla = document.getElementById("tablaVentas");
+        let excelURL = 'data:application/vnd.ms-excel,' + encodeURIComponent(tabla.outerHTML);
+        window.open(excelURL);
+    }
+
+    function backup() {
+        const data = JSON.stringify(ventas);
+        navigator.clipboard.writeText(data);
+        alert("Backup copiado al portapapeles. Guárdalo en un archivo de texto.");
+    }
+
+    function restaurar() {
+        const data = prompt("Pega aquí tu código de backup:");
+        if(data) {
+            try {
+                ventas = JSON.parse(data);
+                guardar();
+            } catch(e) { alert("Error en los datos"); }
+        }
+    }
+
+    function renderizar() {
+        const lista = document.getElementById('listaVentas');
+        lista.innerHTML = '';
+        ventas.forEach(v => {
+            lista.innerHTML += `
+                <tr>
+                    <td>${v.nombre}</td>
+                    <td>$${v.monto}</td>
+                    <td class="${v.estado === 'pagado' ? 'status-pago' : 'status-debe'}" onclick="cambiarEstado(${v.id})" style="cursor:pointer">
+                        ${v.estado.toUpperCase()}
+                    </td>
+                    <td class="no-print">
+                        <button class="btn-whatsapp" onclick="enviarWhatsApp('${v.nombre}', '${v.monto}')">💬</button>
+                        <button onclick="eliminar(${v.id})">🗑️</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    renderizar();
+</script>
+
+</body>
+</html>
