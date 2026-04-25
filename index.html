@@ -67,7 +67,7 @@
                 <option value="Arroz de Leche Especial">Especial</option>
             </select>
             <input type="number" id="cantidad" placeholder="Cant." min="1" value="1">
-            <input type="number" id="precio" placeholder="Precio $12000">
+            <input type="number" id="precio" placeholder="Precio $" value="12000">
             <button class="btn-add" onclick="agregarRegistro()">🚀 Registrar Pedido</button>
         </div>
 
@@ -129,10 +129,10 @@
             estado: 'debe'
         });
         
-        // Limpiar campos
+        // Limpiar campos (mantiene el precio por defecto para el siguiente)
         document.getElementById('cliente').value = '';
         document.getElementById('telefono').value = '';
-        document.getElementById('precio').value = '';
+        document.getElementById('cantidad').value = '1';
         guardar();
     }
 
@@ -152,14 +152,14 @@
     }
 
     function cobrarCliente(v) {
-        const msg = `Hola ${v.nombre}, te saludamos de Arroz de Leche Marle 🍚. Te recordamos tu pedido de ${v.cant} ${v.producto} por un total de $${v.total}. ¿Deseas pagarlo ahora? ¡Gracias!`;
+        const msg = `Hola ${v.nombre}, te saludamos de Arroz de Leche Marle 🍚. Te recordamos tu pedido de ${v.cant} ${v.producto} por un total de $${v.total.toLocaleString()}. ¿Deseas pagarlo ahora? ¡Gracias!`;
         window.open(`https://api.whatsapp.com/send?phone=${v.tel}&text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     function enviarAMi() {
         let deudores = ventas.filter(v => v.estado === 'debe');
         let total = deudores.reduce((acc, v) => acc + v.total, 0);
-        const msg = `Vibras Positivas HM - Reporte:\nTienes ${deudores.length} deudores.\nTotal por cobrar: $${total}`;
+        const msg = `Vibras Positivas HM - Reporte:\nTienes ${deudores.length} deudores.\nTotal por cobrar: $${total.toLocaleString()}`;
         window.open(`https://api.whatsapp.com/send?phone=${MI_CEL}&text=${encodeURIComponent(msg)}`, '_blank');
     }
 
