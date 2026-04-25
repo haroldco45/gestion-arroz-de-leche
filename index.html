@@ -13,11 +13,14 @@
         }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff5f8; color: #333; margin: 0; padding: 20px; }
         .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h1, h2 { text-align: center; color: var(--dark); }
         
-        /* Formulario */
-        .form-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        input, select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; }
+        /* Encabezado con imagen */
+        .header-img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 15px; }
+        h1 { text-align: center; color: var(--dark); margin-top: 0; }
+        
+        /* Formulario mejorado */
+        .form-group { display: grid; grid-template-columns: 2fr 1fr 1fr 1.5fr; gap: 10px; margin-bottom: 20px; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; }
         
         /* Botones */
         button { cursor: pointer; border: none; border-radius: 5px; padding: 10px 15px; font-weight: bold; transition: 0.3s; }
@@ -28,33 +31,38 @@
         .btn-backup { background-color: #607D8B; color: white; }
         
         /* Tabla */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; }
         th, td { border: 1px solid #eee; padding: 12px; text-align: left; }
         th { background-color: var(--primary); color: var(--dark); }
-        .status-pago { color: #2e7d32; font-weight: bold; }
-        .status-debe { color: #c62828; font-weight: bold; }
+        .status-pago { color: #2e7d32; font-weight: bold; background: #e8f5e9; padding: 4px 8px; border-radius: 4px; }
+        .status-debe { color: #c62828; font-weight: bold; background: #ffebee; padding: 4px 8px; border-radius: 4px; }
 
-        /* Footer Créditos */
+        /* Footer */
         .credits { margin-top: 30px; text-align: center; font-size: 0.8em; color: #777; border-top: 1px solid #eee; padding-top: 10px; }
         
-        @media print {
-            .no-print { display: none; }
-            body { background: white; }
-            .container { box-shadow: none; border: none; }
-        }
+        @media print { .no-print { display: none; } .container { box-shadow: none; border: none; } }
+        @media (max-width: 600px) { .form-group { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
 <div class="container">
+    <img src="https://haroldco45.github.io/arrozdelechemarle/arrozdelechemarle.jpg" alt="Arroz de Leche Marle" class="header-img">
+    
     <h1>🍚 Arroz de Leche Marle</h1>
-    <p style="text-align: center;">Gestión de Ventas y Cobros</p>
+    <p style="text-align: center; font-weight: bold;">Control de Pedidos y Cobranza</p>
 
     <div class="no-print">
         <div class="form-group">
             <input type="text" id="cliente" placeholder="Nombre del Cliente">
-            <input type="number" id="valor" placeholder="Valor $">
-            <button class="btn-add" onclick="agregarRegistro()">Añadir Registro</button>
+            <select id="producto">
+                <option value="Arroz de Leche Tradicional">Tradicional</option>
+                <option value="Arroz de Leche con Queso">Con Queso</option>
+                <option value="Arroz de Leche Especial">Especial</option>
+            </select>
+            <input type="number" id="cantidad" placeholder="Cant." min="1" value="1">
+            <input type="number" id="precio_unitario" placeholder="Precio Unid. $">
+            <button class="btn-add" onclick="agregarRegistro()" style="grid-column: span 4;">Registrar Pedido</button>
         </div>
 
         <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
@@ -62,7 +70,7 @@
             <button class="btn-excel" onclick="exportarExcel()">📊 Excel</button>
             <button class="btn-backup" onclick="backup()">💾 Copiar Backup</button>
             <button class="btn-backup" onclick="restaurar()">🔄 Restaurar</button>
-            <button class="btn-whatsapp" onclick="enviarAMi()">📲 Enviar Reporte a Mi</button>
+            <button class="btn-whatsapp" onclick="enviarAMi()">📲 Reporte a Mi (WhatsApp)</button>
         </div>
     </div>
 
@@ -70,13 +78,13 @@
         <thead>
             <tr>
                 <th>Cliente</th>
-                <th>Valor</th>
+                <th>Producto / Cant</th>
+                <th>Total $</th>
                 <th>Estado</th>
                 <th class="no-print">Acciones</th>
             </tr>
         </thead>
-        <tbody id="listaVentas">
-            </tbody>
+        <tbody id="listaVentas"></tbody>
     </table>
 
     <div class="credits">
@@ -85,28 +93,36 @@
 </div>
 
 <script>
-    let ventas = JSON.parse(localStorage.getItem('ventas_marle')) || [];
+    let ventas = JSON.parse(localStorage.getItem('ventas_marle_v2')) || [];
     const MI_CEL = "573117700431";
 
     function guardar() {
-        localStorage.setItem('ventas_marle', JSON.stringify(ventas));
+        localStorage.setItem('ventas_marle_v2', JSON.stringify(ventas));
         renderizar();
     }
 
     function agregarRegistro() {
         const cliente = document.getElementById('cliente').value;
-        const valor = document.getElementById('valor').value;
-        if(!cliente || !valor) return alert("Llena todos los campos");
+        const producto = document.getElementById('producto').value;
+        const cantidad = document.getElementById('cantidad').value;
+        const precio = document.getElementById('precio_unitario').value;
+
+        if(!cliente || !precio || cantidad < 1) return alert("Por favor complete los datos del pedido.");
+
+        const total = parseFloat(cantidad) * parseFloat(precio);
 
         ventas.push({
             id: Date.now(),
             nombre: cliente,
-            monto: valor,
+            producto: producto,
+            cantidad: cantidad,
+            total: total,
             estado: 'debe'
         });
         
         document.getElementById('cliente').value = '';
-        document.getElementById('valor').value = '';
+        document.getElementById('cantidad').value = '1';
+        document.getElementById('precio_unitario').value = '';
         guardar();
     }
 
@@ -125,15 +141,15 @@
         }
     }
 
-    function enviarWhatsApp(nombre, monto) {
-        const msg = `Hola ${nombre}, te recordamos tu saldo de $${monto} en Arroz de Leche Marle. ¡Gracias!`;
+    function enviarWhatsApp(v) {
+        const msg = `Hola ${v.nombre}, te saludamos de Arroz de Leche Marle. Tu pedido de ${v.cantidad} ${v.producto} por valor de $${v.total} está pendiente de pago. ¡Gracias!`;
         window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     function enviarAMi() {
-        let total = ventas.reduce((acc, v) => acc + parseFloat(v.monto), 0);
-        let deudas = ventas.filter(v => v.estado === 'debe').length;
-        const msg = `Resumen Vibras Positivas HM:\nTotal: $${total}\nClientes pendientes: ${deudas}`;
+        let deudores = ventas.filter(v => v.estado === 'debe');
+        let totalDeuda = deudores.reduce((acc, v) => acc + v.total, 0);
+        const msg = `Resumen de Ventas - Vibras Positivas HM\n------------------\nTotal pendiente: $${totalDeuda}\nPedidos por cobrar: ${deudores.length}`;
         window.open(`https://api.whatsapp.com/send?phone=${MI_CEL}&text=${encodeURIComponent(msg)}`, '_blank');
     }
 
@@ -144,19 +160,13 @@
     }
 
     function backup() {
-        const data = JSON.stringify(ventas);
-        navigator.clipboard.writeText(data);
-        alert("Backup copiado al portapapeles. Guárdalo en un archivo de texto.");
+        navigator.clipboard.writeText(JSON.stringify(ventas));
+        alert("Backup copiado al portapapeles.");
     }
 
     function restaurar() {
-        const data = prompt("Pega aquí tu código de backup:");
-        if(data) {
-            try {
-                ventas = JSON.parse(data);
-                guardar();
-            } catch(e) { alert("Error en los datos"); }
-        }
+        const data = prompt("Pega el código de backup:");
+        if(data) { try { ventas = JSON.parse(data); guardar(); } catch(e) { alert("Error"); } }
     }
 
     function renderizar() {
@@ -166,21 +176,22 @@
             lista.innerHTML += `
                 <tr>
                     <td>${v.nombre}</td>
-                    <td>$${v.monto}</td>
-                    <td class="${v.estado === 'pagado' ? 'status-pago' : 'status-debe'}" onclick="cambiarEstado(${v.id})" style="cursor:pointer">
-                        ${v.estado.toUpperCase()}
+                    <td>${v.producto} (x${v.cantidad})</td>
+                    <td><strong>$${v.total.toLocaleString()}</strong></td>
+                    <td>
+                        <span class="${v.estado === 'pagado' ? 'status-pago' : 'status-debe'}" onclick="cambiarEstado(${v.id})" style="cursor:pointer">
+                            ${v.estado.toUpperCase()}
+                        </span>
                     </td>
                     <td class="no-print">
-                        <button class="btn-whatsapp" onclick="enviarWhatsApp('${v.nombre}', '${v.monto}')">💬</button>
+                        <button class="btn-whatsapp" onclick='enviarWhatsApp(${JSON.stringify(v)})'>💬</button>
                         <button onclick="eliminar(${v.id})">🗑️</button>
                     </td>
                 </tr>
             `;
         });
     }
-
     renderizar();
 </script>
-
 </body>
 </html>
